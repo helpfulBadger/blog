@@ -3,7 +3,7 @@ DefaultContentLanguage  = "en"
 languageCode = "en-us"
 title = "Helpful Badger's Blog"
 theme = "hugo-future-imperfect-slim"
-paginate                = 3
+paginate                = 10
 pluralizeListTitles     = false
 disableLanguages = [""]
 
@@ -14,9 +14,12 @@ disableLanguages = [""]
   enableCDN             = false
   cssFiles              = ["default"]
   jsFiles               = ["default"]
-  highlightjs           = true
-  highlightjsTheme      = "github"
+  highlightjs           = false
+  highlightjsTheme      = "dracula"
   highlightjsLang       = ["html", "css", "js", "toml"]
+  pygmentsCodefences            = true
+  pygmentsCodefencesGuessSyntax = true
+  pygmentsStyle                 = "dracula"
   viewMorePostsLink     = "/blog/"
   readingTime           = true
   socialShare           = ["twitter", "facebook", "reddit", "linkedin", "pinterest", "email"]
@@ -62,7 +65,7 @@ disableLanguages = [""]
     socialFooter        = true
 
   [params.staticman]
-    enabled             = true
+    enabled             = false
     api                 = ""  # No Trailing Slash
     gitProvider         = ""
     username            = ""
@@ -119,3 +122,37 @@ disableLanguages = [""]
   # Professional/Business Oriented Communities
   linkedin              = "example"
   # Social Networks
+
+[markup]
+  defaultMarkdownHandler = "goldmark"
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      definitionList = true
+      footnote = true
+      linkify = true
+      strikethrough = true
+      table = true
+      taskList = true
+      typographer = true
+    [markup.goldmark.parser]
+      attribute = true
+      autoHeadingID = true
+      autoHeadingIDType = "github"
+    [markup.goldmark.renderer]
+      unsafe = true
+      hardWraps = false
+      xhtml = false  
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = true
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = true
+    lineNumbersInTable = true
+    noClasses = false
+    style = "dracula"
+    tabWidth = 2
+  [markup.tableOfContents]
+    endLevel = 3
+    ordered = false
+    startLevel = 1

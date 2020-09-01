@@ -1,7 +1,7 @@
 +++
 author = "Helpful Badger"
 title = "Learning About Cloud Images"
-draft = false
+draft = true
 date = 2020-06-06T13:27:14-04:00
 description = "Learning about Ubuntu Cloud Images by scripting them with Virtual Box."
 tags = [

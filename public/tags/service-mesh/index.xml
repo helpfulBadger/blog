@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Service Mesh on Helpful Badger&#39;s Blog</title>
+    <link>https://helpfulbadger.github.io/tags/service-mesh/</link>
+    <description>Recent content in Service Mesh on Helpful Badger&#39;s Blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <lastBuildDate>Mon, 31 Aug 2020 13:27:14 -0400</lastBuildDate>
+    
+	<atom:link href="https://helpfulbadger.github.io/tags/service-mesh/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Using Envoy as a Front Proxy</title>
+      <link>https://helpfulbadger.github.io/blog/envoy_opa_1_front_proxy/</link>
+      <pubDate>Mon, 31 Aug 2020 13:27:14 -0400</pubDate>
+      
+      <guid>https://helpfulbadger.github.io/blog/envoy_opa_1_front_proxy/</guid>
+      <description>Photo by Mattia Serrani on Unsplash
+Using Envoy as a Front Proxy Overview Envoy is an open source edge and service proxy that has become extremely popular as the backbone underneath most of the leading service mesh products (both open source and commercial). This article is intended to demystify it a bit and help people understand how to use it on it&amp;rsquo;s own in a minimalist fashion.
+Envoy is just like any other proxy.</description>
+    </item>
+    
+  </channel>
+</rss>
