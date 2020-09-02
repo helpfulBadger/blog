@@ -17,10 +17,10 @@ images  = ["img/2020/08/mattia-serrani-HgUAqCGN9-o-unsplash.jpg"]
 
 Photo by [Mattia Serrani](https://unsplash.com/@mattserra13?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText) on [Unsplash](https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText)
 
+# Getting Started with Envoy & Open Policy Agent --- 01 ---
+## Using Envoy as a Front Proxy
 
-# Using Envoy as a Front Proxy
-
-This is the 1st Envory & Open Policy Agent (OPA) Getting Started Guide. Each guide is intended to explore a single Envoy or OPA feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide to deliver a very powerful authorization service by the end of the series. 
+This is the 1st Envory & Open Policy Agent (OPA) Getting Started Guide. Each guide is intended to explore a single Envoy or OPA feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide with the end goal of building a very powerful authorization service by the end of the series. 
 
 Here is a list of the Getting Started Guides that are currently available.
 
@@ -29,6 +29,7 @@ Here is a list of the Getting Started Guides that are currently available.
 1. [Using Envoy as a Front Proxy]({{< ref "/blog/envoy_opa_1_front_proxy.md" >}} "Learn how to set up Envoy as a front proxy with docker")
 1. [Adding Observability Tools]({{< ref "/blog/envoy_opa_2_adding_observability.md" >}} "Learn how to add ElasticSearch and Kibana to your Envoy front proxy environment")
 1. [Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")
+1. [Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")
 
 ## Overview
 
@@ -55,13 +56,14 @@ The diagram below shows the environment that we are about to build and deploy lo
 The [code for the complete working example](https://github.com/helpfulBadger/envoy_getting_started/tree/master/01_front_proxy) can be found on Github. We will start with the Envoy docker images. The Envoy images are located on [Dockerhub](https://hub.docker.com/r/envoyproxy/envoy/tags). We will use `docker-compose` to build some configurability into our Envoy environment. 
 
 ### Dockerfile
-{{< gist helpfulBadger 474f08336d221b6756f38fedc02b9740 >}}
+
+<img class="special-img-class" src="/img/2020/08/01_dockerfile.png" />
 
 The `entrypoint.sh` file is where the magic happens. We will configure environment variables in our docker-compose file to determine which service (`SERVICE_NAME`) Envoy routes to and the port (`SERVICE_PORT`) on that service. Additionally, we specify how much detail is captured in the logs by setting the `DEBUG_LEVEL` environment variable. As you can see from the script below on line 3, we replace those environment variables on the fly in Envoy's configuration file before starting Envoy. 
 
 ### entrypoint.sh
 
-{{< gist helpfulBadger 9810fb19874141e18619d0c2426fadde >}}
+<img class="special-img-class" src="/img/2020/08/01_entrypoint_sh.png" />
 
 Since we don't have a configuration file yet, we will cover that next. Envoy is very flexible and powerful. There is an enormous amount of expressiveness that the Envoy API and configuration files support. With this flexibility and power, Envoy configuration files can become quite complicated with a lot layers in the YAML hierarchy. Additionally, each feature has a lot of configuration parameters. The documentation can only cover so much of that functionality with an open source community of volunteers. 
 
@@ -73,7 +75,7 @@ The `http_connection_manager` component does this for us. It's configuration sta
 
 ### Envoy Configuration (envoy.yaml)
 
-{{< gist helpfulBadger 6776c186ec8e35b824222f5f57832279 >}}
+<img class="special-img-class" src="/img/2020/08/01_Envoy_config.png" />
 
 The cluster definitions begin on line 25. We can see that there is only a single cluster defined. It has the name `service`, uses DNS to find server instances and uses round robin to direct traffic across multiple instances. The hostname is on line 32 and the port is on line 33. As we can see these are the environment variables that we will swap out with the entry.sh script. 
 
@@ -84,15 +86,16 @@ The last section of the configuration file tells Envoy where to listen for admin
 
 Now that we understand the Envoy configuration we can move on to understanding the rest of the simple environment that we are setting up. Line 4 shows the trigger that causes docker to build the Envoy container. Docker will only build the Envoy Dockerfile the first time it sees that an image does not exist. If you want to force rebuilding the Envoy container on subsequent runs add the `--build` parameter to your docker compose command.  We expose Envoy to the host network on lines 6 and 7 and provide the configuration file that we just created on line 9. 
 
-{{< gist helpfulBadger c2abd820fb9d41b65a64d5aeb5bdc38f >}}
+
+<img class="special-img-class" src="/img/2020/08/01_docker_compose.png" />
 
 The service to route to and port are defined on the environment variables on lines 12 and 13. Notice the name app matches the name of our final service on line 15. We are simply using HTTPBIN to reflect our request back to us. 
 
 ## Running and Trying out our Example
 
-The last step to getting our front proxy up is simply running the included script that demonstrates our example. The script explains what it is about to do to ensure you know what are about to see scrolling across your terminal screen. Line 8 starts our environment. Line 14 let's you check to make sure both containers are running before trying to send them a request. 
+The last step to getting our front proxy up is simply running the included script `test.sh` that demonstrates our example. The script explains what it is about to do to ensure you know what are about to see scrolling across your terminal screen. Line 8 starts our environment. Line 14 let's you check to make sure both containers are running before trying to send them a request. 
 
-{{< gist helpfulBadger 99cd40f5e4a0f7c6f52e0f6ab384628d >}}
+<img class="special-img-class" src="/img/2020/08/01_Demo_script.png" />
 
 Line 19 simply calls Envoy with a curl command with the `--verbose` parameter set so that you can see the headers and request details. Then line 25 tears down the whole environment. 
 
@@ -100,13 +103,15 @@ Line 19 simply calls Envoy with a curl command with the `--verbose` parameter se
 
 If you have successfully started your environment then you should see something like this: 
 
-{{< gist helpfulBadger da12d55bdea21f53d1c21f43b75dde50 >}}
+<img class="special-img-class" src="/img/2020/08/01_Containers_up.png" />
+
 
 ## We Succeeded!!!
 
 You should see something like this if you successfully called HTTPBin through Envoy:
 
-{{< gist helpfulBadger f3462263e846c7d203694cdd7393db2b >}}
+<img class="special-img-class" src="/img/2020/08/01_Curl_Response.png" />
+
 
 # Congratulations
 
