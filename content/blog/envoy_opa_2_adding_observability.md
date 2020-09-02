@@ -22,9 +22,26 @@ images  = ["img/2020/08/observatory-unsplash.jpg"]
 <span>Photo by <a href="https://unsplash.com/@alexeckermann?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Alex Eckermann</a> on <a href="https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
 
 
-# Adding Log Aggregation to our Envoy Example
+# Envoy & Open Policy Agent
+## Adding Log Aggregation to our Envoy Example
 
-This is the 2nd blog post in a series of getting started guides for using Envoy and Open Policy Agent to authorize API requests. Later on as we start to develop authorization rules it may be handy to have all of the logs aggregated and displayed in one place for your development and troubleshooting activies. In this article we will walk through how to setup the EFK stack to pull your logs together from all of the docker containers in your local development environment. All of the [source code for this getting started example](https://github.com/helpfulBadger/envoy_getting_started/tree/master/02_front_proxy_kibana) is located on github.
+This is the 2nd Envory & Open Policy Agent (OPA) Getting Started Guide. Each guide is intended to explore a single Envoy or OPA feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide to deliver a very powerful authorization service by the end of the series. 
+
+While our solution is still very simple, it is a great time to show how to make our solution observable with log aggregation. This makes it easier to think about how to scale and productionize our solution.  As we start to develop and apply authorization rules at scale it will be handy to have all of the logs aggregated and displayed in one place for development and troubleshooting activies. In this article we will walk through how to setup the EFK stack to pull your logs together from all of the docker containers in your local development environment. All of the [source code for this getting started example](https://github.com/helpfulBadger/envoy_getting_started/tree/master/02_front_proxy_kibana) is located on github. 
+
+Here is a list of the Getting Started Guides that are currently available.
+
+## Getting Started Guides
+
+1. [Using Envoy as a Front Proxy]({{< ref "/blog/envoy_opa_1_front_proxy.md" >}} "Learn how to set up Envoy as a front proxy with docker")
+1. [Adding Observability Tools]({{< ref "/blog/envoy_opa_2_adding_observability.md" >}} "Learn how to add ElasticSearch and Kibana to your Envoy front proxy environment")
+1. [Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")
+
+# Solution Overview
+
+The solution that we will build in this blog is shown below. We will send docker logs into an EFK stack that is also running inside docker. Each of the containers in our solution simply send logs to Standard out and / or Standard Error. No agents nor other special software is requirements are imposed on the observered applications.
+
+<img class="special-img-class" src="/img/2020/08/Envoy-front proxy-Observability_1.svg" /><br>
 
 ## Adding EFK containers
 
