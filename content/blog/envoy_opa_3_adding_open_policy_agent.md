@@ -21,9 +21,10 @@ images  = ["img/2020/08/Royal-Guard-unsplash.jpg"]
 
 <span>Photo by <a href="https://unsplash.com/@kutanural?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Kutan Ural</a> on <a href="https://unsplash.com/s/photos/guard-door?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
 
-# Envoy & Open Policy Agent
+# Getting Started with Envoy & Open Policy Agent --- 03 ---
+## Plugging OPA into Envoy
 
-This is the 3rd Envory & Open Policy Agent Getting Started Guide. Each guide is intended to explore a single feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide to build a very powerful authorization services by the end of the series. 
+This is the 3rd Envory & Open Policy Agent Getting Started Guide. Each guide is intended to explore a single feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide with the end goal of building a very powerful authorization service by the end of the series. 
 
 Here is a list of the Getting Started Guides that are currently available.
 
@@ -32,6 +33,7 @@ Here is a list of the Getting Started Guides that are currently available.
 1. [Using Envoy as a Front Proxy]({{< ref "/blog/envoy_opa_1_front_proxy.md" >}} "Learn how to set up Envoy as a front proxy with docker")
 1. [Adding Observability Tools]({{< ref "/blog/envoy_opa_2_adding_observability.md" >}} "Learn how to add ElasticSearch and Kibana to your Envoy front proxy environment")
 1. [Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")
+1. [Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")
 
 ## Envoy's External Authorization API
 
@@ -84,19 +86,20 @@ This is the same docker compose file as our initial getting started example with
 * The gRPC service for Envoy is configured on line 23
 * The logs are sent to the console for a log aggregation solution to pickup (or not) on line 24
 
-{{< gist helpfulBadger 8405aa13b6f33100edd8f2ec2ae97a79 >}}
+<img class="special-img-class" src="/img/2020/08/03_compose_changes.png" /><br>
+
 
 ## Envoy Config Changes
 
 There are a few things that we need to add to the envoy configuration to enable external authorization:
-* We added an external authorization configuration at line 24.
+* We added an external authorization configuration at line 23.
 * failure_mode_allow on line 26 determines whether envoy fails open or closed when the authorization service fails.
 * with_request_body determines if the request body is sent to the authorization service.
 * max_request_bytes determines how large of a request body Envoy will permit.
 * allow_partial_message determines if a partial body is sent or not when a buffer maximum is reached.
 * The grpc_service object on line 30 specifies how to reach the Open Policy Agent endpoint to make an authorization decision.
 
-{{< gist helpfulBadger 5df3e9e86d2c2bd9ccd7bcfdb8439122 >}}
+<img class="special-img-class" src="/img/2020/08/03_Envoy_config.png" /><br>
 
 ## Rego: OPA's Policy Language
 
@@ -105,21 +108,21 @@ There are a lot of other examples of how to write Rego policies on other sites. 
 * The import statement on line 3 navigates the heavily nested data structure that Envoy sends us and gives us a shorter alias to refer to a particular section of the input.
 * On line 5 we have a rule named `allow` and we set it's default value to and object that Envoy is expecting. 
     * The allowed property determines if the request is permitted to go through or not.
-    * The headers property allows us to set headers on either the forwarded request (if approved) or on the rejected request (if denied)
-    * The body property can be used to communicate error message details to the requestor. It has no affect on requests approved for forwarding
+    * The headers property allows us to set headers on either the forwarded request (if approved) or on the rejected request (if denied). OPA does not marshal any REGO data types on your behalf. All header values must be specified as a string. 
+    * The body property can be used to communicate error message details to the requestor. It has no affect on requests approved for forwarding. OPA does not marshal any REGO data types on your behalf. The body value must be specified as a string. 
     * The http_status property can be set on any rejected requests to any value as desired
 * The next section starting at line 12 specifies the logic for approving the request to move forward
     * On line 12 the allow rule is set to the value of the response variable that we define in the body of the rule
     * Line 13 is the only condition we have defined for approval of the request. The request method simply needs to be a POST.
     * If true then we set the response to the values on lines 15 and 16. 
 
-{{< gist helpfulBadger cd6c55261fa2b84d1cebbb797332281d >}}
+<img class="special-img-class" src="/img/2020/08/03_rego_policy.png" /><br>
 
 ## Input data sent from Envoy
 
 Now we dive into the details of the input data structure sent from Envoy. 
 * Line 3 is an object that describes the IP address and Port that the request is going to
-* Line 16 is the request object itself. The unmarshalled body is present along with:
+* Line 10 is the request object itself. The unmarshalled body is present along with:
     * request headers
     * hostname where the original request was sent
     * a unique request ID assigned by Envoy
@@ -127,33 +130,36 @@ Now we dive into the details of the input data structure sent from Envoy.
     * unparsed path
     * protocol 
     * request size
-* Line 43 is a object that describes the IP address and port where the request originated
-* Line 56 is where Envoy has already done some work for us to parse the request body (if it was configured to be forwarded)
-* Line 60 and 63 are the parsed path and query parameters respectively
-* Finally, line 71 let's us know whether we have the complete request body or not
+* Line 34 is a object that describes the IP address and port where the request originated
+* Line 45 is where Envoy has already done some work for us to parse the request body (if it was configured to be forwarded)
+* Line 46 and 47 are the parsed path and query parameters respectively
+* Finally, line 48 let's us know whether we have the complete request body or not
 
-{{< gist helpfulBadger 9c367ca3d8214f8edd4706b04863a38c >}}
+<img class="special-img-class" src="/img/2020/08/03_rego_input.png" /><br>
 
 ## Reviewing the Request Flow in Envoy's Logs
 
 In debug mode, we have a lot of rich information that Envoy logs for us to help us determine what may be going wrong as we develop our system. 
 * Line 1 shows our request first coming in 
 * The next several lines show us the request headers
-* Line 12 let's us know that envoy is buffering the request until it reaches the buffer limit that we set
-* Line 15 and 16 show us that Envoy forwarded the request to our authorization service and got an approval to forward the request
+* Line 13-14 let's us know that envoy is buffering the request until it reaches the buffer limit that we set
+* Line 16-20 show us that Envoy forwarded the request to our authorization service and got an approval to forward the request
 * The remainder of the logs show envoy forwarding the request to its destination and then back to the calling client
 
-{{< gist helpfulBadger fcb65af0cf9d7814883cec2f5bc1259c >}}
+<img class="special-img-class" src="/img/2020/08/03_envoy_log.png" /><br>
 
 ## Reviewing OPA's Decision Log
 
 The open policy agent decision logs include the input that we just reviewed and some other information that we can use for debugging, troubleshoot or audit logging. The interesting parts that we haven't reviewed yet:
 * The decision ID on line 2 can be matched against other OPA log entries related to this decision
-* Line 75 has the labels that show which Envoy instance the request came from
-* Line 80 is an object that contains the performance metrics for the decision
-* Line 88 shows the response that OPA sent back to Envoy
+* Line 5 - Envoy sends us the destination of the request
+* Line 7 - Envoy sends the request details. The unmarshalled body is only available if we setup the buffering and forwarding in the Envoy configuration.
+* line 30 - Envoy also sends us the source IP address that it received the request from.
+* Line 37 has the labels that show which Envoy instance the request came from
+* Line 42 is an object that contains the performance metrics for the decision
+* Line 50 shows the response that OPA sent back to Envoy
 
-{{< gist helpfulBadger 2bdfa1c8324e975fe8ed9acf1f4ab14a >}}
+<img class="special-img-class" src="/img/2020/08/03_OPA_decision_log.png" /><br>
 
 # Taking this solution for a spin
 

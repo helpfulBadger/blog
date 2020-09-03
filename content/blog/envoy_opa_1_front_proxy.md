@@ -93,11 +93,11 @@ The service to route to and port are defined on the environment variables on lin
 
 ## Running and Trying out our Example
 
-The last step to getting our front proxy up is simply running the included script `test.sh` that demonstrates our example. The script explains what it is about to do to ensure you know what are about to see scrolling across your terminal screen. Line 8 starts our environment. Line 14 let's you check to make sure both containers are running before trying to send them a request. 
+The last step to getting our front proxy up is simply running the included script `test.sh` that demonstrates our example. The script explains what it is about to do to ensure you know what are about to see scrolling across your terminal screen. Line 3 starts our environment. Line 8 let's you check to make sure both containers are running before trying to send them a request. 
 
 <img class="special-img-class" src="/img/2020/08/01_Demo_script.png" />
 
-Line 19 simply calls Envoy with a curl command with the `--verbose` parameter set so that you can see the headers and request details. Then line 25 tears down the whole environment. 
+Line 10 simply calls Envoy with a curl command with the `--verbose` parameter set so that you can see the headers and request details. Then line 12 tears down the whole environment. 
 
 ## Containers UP!!!!
 

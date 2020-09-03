@@ -22,10 +22,10 @@ images  = ["img/2020/08/observatory-unsplash.jpg"]
 <span>Photo by <a href="https://unsplash.com/@alexeckermann?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Alex Eckermann</a> on <a href="https://unsplash.com/?utm_source=unsplash&amp;utm_medium=referral&amp;utm_content=creditCopyText">Unsplash</a></span>
 
 
-# Envoy & Open Policy Agent
+# Getting Started with Envoy & Open Policy Agent --- 02 ---
 ## Adding Log Aggregation to our Envoy Example
 
-This is the 2nd Envory & Open Policy Agent (OPA) Getting Started Guide. Each guide is intended to explore a single Envoy or OPA feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide to deliver a very powerful authorization service by the end of the series. 
+This is the 2nd Envory & Open Policy Agent (OPA) Getting Started Guide. Each guide is intended to explore a single Envoy or OPA feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide with the goal of creating a very powerful authorization service by the end of the series. 
 
 While our solution is still very simple, it is a great time to show how to make our solution observable with log aggregation. This makes it easier to think about how to scale and productionize our solution.  As we start to develop and apply authorization rules at scale it will be handy to have all of the logs aggregated and displayed in one place for development and troubleshooting activies. In this article we will walk through how to setup the EFK stack to pull your logs together from all of the docker containers in your local development environment. All of the [source code for this getting started example](https://github.com/helpfulBadger/envoy_getting_started/tree/master/02_front_proxy_kibana) is located on github. 
 
@@ -36,6 +36,7 @@ Here is a list of the Getting Started Guides that are currently available.
 1. [Using Envoy as a Front Proxy]({{< ref "/blog/envoy_opa_1_front_proxy.md" >}} "Learn how to set up Envoy as a front proxy with docker")
 1. [Adding Observability Tools]({{< ref "/blog/envoy_opa_2_adding_observability.md" >}} "Learn how to add ElasticSearch and Kibana to your Envoy front proxy environment")
 1. [Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")
+1. [Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")
 
 # Solution Overview
 
@@ -45,15 +46,16 @@ The solution that we will build in this blog is shown below. We will send docker
 
 ## Adding EFK containers
 
-We will be using Fluent Bit in this example because it is lite weight and simpler to deal with than Logstash or full fledged FluentD. Below is a gist with a very basic configuration and no special optimizations. Lines 9 and 30 use the `depend_on` property to cause docker to start elasticSearch first and then the other containers that depend on elasticSearch. 
+We will be using Fluent Bit in this example because it is lite weight and simpler to deal with than Logstash or full fledged FluentD. Below is a very basic configuration with no special optimizations. Lines 18 - 49 add the EFK stack to our environment.  Lines 16 and 47 use the `depend_on` property to cause docker to start elasticSearch first and then Kiban and Fluent Bit that depend on elasticSearch. 
 
-{{< gist helpfulBadger 7414ff8326c13f5ab2890e4a55c9edc3 >}}
+<img class="special-img-class" src="/img/2020/08/02_compose_step_1.png" /><br>
 
 ## Wiring our containers into EFK
 
-With the log aggregation containers added to our docker-compose file, we now need to wire them into the other containers in our environment. The gist below shows a couple of small changes that we needed to make to our compose file from Getting Started Guide #1. We added the property at line 14 below which expresses our dependency on elasticSeach. Additionally, we need to wire standard out and standard error from our containers to fluentBit. This is done through the logging properties on lines 17 and 27. The driver line tells docker which log driver to use and the tag help make it more clear which container is the source of the logs. 
+With the EFK log aggregation containers added to our docker-compose file, we now need to wire them into the other containers in our environment. The changes below show a couple of small changes that we needed to make to our compose file from where we left off in Getting Started Guide #1. We added the property at line 14 below which expresses our dependency on elasticSeach. Additionally, we need to wire standard out and standard error from our containers to Fluent Bit. This is done through the logging properties on lines 17 and 27. The driver line tells docker which log driver to use and the tag help make it more clear which container is the source of the logs. 
 
-{{< gist helpfulBadger e701287a1847345c6997946a5b98787e >}}
+<img class="special-img-class" src="/img/2020/08/02_compose_step_2.png" /><br>
+
 
 # Taking things for a spin
 
