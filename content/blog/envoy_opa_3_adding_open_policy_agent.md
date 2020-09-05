@@ -26,14 +26,16 @@ images  = ["img/2020/08/Royal-Guard-unsplash.jpg"]
 
 This is the 3rd Envory & Open Policy Agent Getting Started Guide. Each guide is intended to explore a single feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide with the end goal of building a very powerful authorization service by the end of the series. 
 
+All of the source code for this getting started example is located on github. <span style="color:blue"> ------> [Envoy & OPA GS # 3](https://github.com/helpfulBadger/envoy_getting_started/tree/master/03_opa_integration) </span>
+
 Here is a list of the Getting Started Guides that are currently available.
 
 ## Getting Started Guides
 
-1. [Using Envoy as a Front Proxy]({{< ref "/blog/envoy_opa_1_front_proxy.md" >}} "Learn how to set up Envoy as a front proxy with docker")
-1. [Adding Observability Tools]({{< ref "/blog/envoy_opa_2_adding_observability.md" >}} "Learn how to add ElasticSearch and Kibana to your Envoy front proxy environment")
-1. [Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")
-1. [Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")
+1. <span style="color:blue">[Using Envoy as a Front Proxy]({{< ref "/blog/envoy_opa_1_front_proxy.md" >}} "Learn how to set up Envoy as a front proxy with docker")</span>
+1. <span style="color:blue">[Adding Observability Tools]({{< ref "/blog/envoy_opa_2_adding_observability.md" >}} "Learn how to add ElasticSearch and Kibana to your Envoy front proxy environment")</span>
+1. <span style="color:blue">[Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")</span>
+1. <span style="color:blue">[Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")</span>
 
 ## Envoy's External Authorization API
 
@@ -45,7 +47,7 @@ In this example we will be using a pre-built Open Policy Agent container that al
 
 The Open Policy Agent site describes it very succinctly 
 
-The [Open Policy Agent (OPA)](https://www.openpolicyagent.org/) is an open source, general-purpose policy engine. OPA provides a declarative language that let’s you specify policy as code and APIs to offload policy decision-making from your software. OPA to enforce policies in microservices, Kubernetes, CI/CD pipelines, API gateways, or nearly any other software.
+The <span style="color:blue">[Open Policy Agent (OPA)](https://www.openpolicyagent.org/)</span> is an open source, general-purpose policy engine. OPA provides a declarative language that let’s you specify policy as code and APIs to offload policy decision-making from your software. OPA to enforce policies in microservices, Kubernetes, CI/CD pipelines, API gateways, or nearly any other software.
 
 OPA focuses exclusively on making policy decisions and not on policy enforcement. OPA pairs with Envoy for policy enforcement. OPA can run as:
 * A standalone service accessible via an API
@@ -69,7 +71,7 @@ OPA generates policy decisions by evaluating the query input against policies an
 
 Policy decisions are not limited to simple yes/no or allow/deny answers. Policies can generate any arbitrary structured data as output.
 
-This getting started example is based on [this OPA tutorial](https://www.openpolicyagent.org/docs/latest/envoy-authorization/) using docker-compose instead of Kubernetes.
+This getting started example is based on <span style="color:blue">[this OPA tutorial](https://www.openpolicyagent.org/docs/latest/envoy-authorization/)</span> using docker-compose instead of Kubernetes.
 
 
 # Solution Overview
@@ -86,7 +88,7 @@ This is the same docker compose file as our initial getting started example with
 * The gRPC service for Envoy is configured on line 23
 * The logs are sent to the console for a log aggregation solution to pickup (or not) on line 24
 
-<img class="special-img-class" src="/img/2020/08/03_compose_changes.png" /><br>
+<img class="special-img-class" src="/img/2020/08/03_compose_changes_e790322fdb.png" /><br>
 
 
 ## Envoy Config Changes
