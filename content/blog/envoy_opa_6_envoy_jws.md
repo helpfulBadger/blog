@@ -26,7 +26,7 @@ images  = ["img/2020/08/jws-signatures-GJao3ZTX9gU-unsplash.jpg"]
 
 This is the 6th Envoy & Open Policy Agent Getting Started Guide. Each guide is intended to explore a single feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide with the end goal of building a very powerful authorization service by the end of the series. 
 
-The source code for this getting started examples is located on Github. <span style="color:blue"> ------>  [Envoy & OPA GS # 6](https://github.com/helpfulBadger/envoy_getting_started/tree/master/06_envoy_validate_jws) </span>
+The source code for this getting started example is located on Github. <span style="color:blue"> ------>  [Envoy & OPA GS # 6](https://github.com/helpfulBadger/envoy_getting_started/tree/master/06_envoy_validate_jws) </span>
 
 
 
@@ -40,6 +40,7 @@ Here is a list of the Getting Started Guides that are currently available.
 1. <span style="color:blue">[Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")</span>
 1. <span style="color:blue">[JWS Signature Validation with OPA]({{< ref "/blog/envoy_opa_5_opa_jws.md" >}} "Learn how to validate JWS signatures with Open Policy Agent")</span>
 1. <span style="color:blue">[JWS Signature Validation with Envoy]({{< ref "/blog/envoy_opa_6_envoy_jws.md" >}} "Learn how to validate JWS signatures natively with Envoy")</span>
+1. <span style="color:blue">[Putting It All Together with Composite Authorization]({{< ref "/blog/envoy_opa_7_app_contracts.md" >}} "Learn how to Implement Application Specific Authorization Rules")</span>
 
 ## Introduction
 
