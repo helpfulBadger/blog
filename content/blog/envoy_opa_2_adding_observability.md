@@ -25,7 +25,7 @@ images  = ["img/2020/08/observatory-unsplash.jpg"]
 # Getting Started with Envoy & Open Policy Agent --- 02 ---
 ## Adding Log Aggregation to our Envoy Example
 
-This is the 2nd Envory & Open Policy Agent (OPA) Getting Started Guide. Each guide is intended to explore a single Envoy or OPA feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide with the goal of creating a very powerful authorization service by the end of the series. 
+This is the 2nd Envoy & Open Policy Agent (OPA) Getting Started Guide. Each guide is intended to explore a single Envoy or OPA feature and walk through a simple implementation. Each guide builds on the concepts explored in the previous guide with the goal of creating a very powerful authorization service by the end of the series. 
 
 While our solution is still very simple, it is a great time to show how to make our solution observable with log aggregation. This makes it easier to think about how to scale and productionize our solution.  As we start to develop and apply authorization rules at scale it will be handy to have all of the logs aggregated and displayed in one place for development and troubleshooting activies. In this article we will walk through how to setup the EFK stack to pull your logs together from all of the docker containers in your local development environment. 
 
@@ -40,6 +40,7 @@ Here is a list of the Getting Started Guides that are currently available.
 1. <span style="color:blue">[Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")</span>
 1. <span style="color:blue">[Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")</span>
 1. <span style="color:blue">[JWS Signature Validation with OPA]({{< ref "/blog/envoy_opa_5_opa_jws.md" >}} "Learn how to validate JWS signatures with Open Policy Agent")</span>
+1. <span style="color:blue">[JWS Signature Validation with Envoy]({{< ref "/blog/envoy_opa_6_envoy_jws.md" >}} "Learn how to validate JWS signatures natively with Envoy")</span>
 
 # Solution Overview
 
