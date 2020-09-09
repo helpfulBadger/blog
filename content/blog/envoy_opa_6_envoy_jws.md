@@ -77,7 +77,7 @@ The configuration below shows the properties we just described in the color red.
                 <span style="color:blue">http_filters</span>:
                   - <span style="color:red">name</span>: <span style="color:red">envoy.filters.http.jwt_authn</span>
                     <span style="color:red">typed_config</span>:
-                      <span style="color:red">"@type"</span>: <span style="color:red">"type.googleapis.com/envoy.config.filter.http.jwt_authn.v2alpha.JwtAuthentication"</span>
+                      <span style="color:red">"@type"</span>: <span style="color:red">"type.googleapis.com/envoy.extensions.filters.http.jwt_authn.v3.JwtAuthentication"</span>
                       <span style="color:red">providers</span>:
                         <span style="color:red">workforce_provider</span>:
                           <span style="color:red">issuer</span>: <span style="color:red">workforceIdentity.example.com</span>

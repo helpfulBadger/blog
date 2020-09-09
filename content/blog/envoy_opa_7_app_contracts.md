@@ -42,3 +42,17 @@ Here is a list of the Getting Started Guides that are currently available.
 1. <span style="color:blue">[Putting It All Together with Composite Authorization]({{< ref "/blog/envoy_opa_7_app_contracts.md" >}} "Learn how to Implement Application Specific Authorization Rules")</span>
 
 ## Introduction
+
+In this example 
+<pre><code>
+/<span style="color:brown"><strong>api</strong></span>/<span style="color:blue"><strong>customer</strong></span>/*
+/<span style="color:brown"><strong>api</strong></span>/<span style="color:blue"><strong>customer</strong></span>/*/account/*
+/<span style="color:brown"><strong>api</strong></span>/<span style="color:blue"><strong>customer</strong></span>/*/messages/*
+/<span style="color:brown"><strong>api</strong></span>/<span style="color:blue"><strong>customer</strong></span>/*/order/*
+/<span style="color:brown"><strong>api</strong></span>/<span style="color:blue"><strong>customer</strong></span>/*/paymentcard/*
+/<span style="color:brown"><strong>api</strong></span>/featureFlags
+/<span style="color:brown"><strong>api</strong></span>/order/*
+/<span style="color:brown"><strong>api</strong></span>/order/*/payment/*
+/<span style="color:brown"><strong>api</strong></span>/product/*
+/<span style="color:brown"><strong>api</strong></span>/shipment/*
+</code><pre>
