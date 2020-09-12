@@ -126,4 +126,54 @@ idProviderPermissions = {
 }
 </code></pre>
 
+## Our Environment
+
+In this example we have replaced our HTTPBin container as our ultimate destination with Hoverfly. <span style="color:blue">[Hoverfly](https://hoverfly.io/)</span> is a light-weight, super fast API mocking server that is API driven and highly extensible. This is used to simulate all of the APIs that we defined above. The API Mocks are defined in the <span style="color:blue">[config.json](https://github.com/helpfulBadger/envoy_getting_started/blob/master/07_opa_validate_method_uri/compose/hoverfly/config.json)</span> file in the `compose\hoverfly` directory.
+
+The other change that we have made is a much more sophisticated and comprehensive set of tests using Newman. <span style="color:blue">[Newman](https://learning.postman.com/docs/running-collections/using-newman-cli/command-line-integration-with-newman/)</span> is a command line driven postman collection runner. Postman has a testing capability. This feature runs tests that are expressed in Javascript and uses a built in library of test functions. The <span style="color:blue">[Postman collection for Getting Started #7](https://github.com/helpfulBadger/envoy_getting_started/blob/master/07_opa_validate_method_uri/data/Envoy_OPA.postman_collection.json)</span> with tests is included in this example in the data directory that 
+
+<img class="special-img-class" src="/img/2020/09/Envoy-front proxy-Hoverfly.svg" /><br>
+
+## Authorization Policies
+
+User and system identity information is communicated as follows:
+* We have some sort of access token in the Authorization header. What API gateway is in use and how it works is out of scope for this example.
+* Some user authentication system that we are using (out of scope of this article) has produced evidence of authentication in the form of an JWS Identity Token and given this to our client application. The client application places the identity token in the `Actor-Token` header of the request.
+* The API gateway, the client application itself or another system (out of scope of this article), has securely authenticated the client application and given it a JWS token to assert information in a tamper proof way about our client application. 
+
+### Stage 1 - Envoy validates JWS Tokens
+These JWS tokens are validated by Envoy before they are ever sent to OPA. Envoy and OPA Getting Started Guide #5 showed us how to do this. Our Envoy.yaml file for this example has made one small change to the <span style="color:blue">[JWT provider configurations](https://github.com/helpfulBadger/envoy_getting_started/blob/master/07_opa_validate_method_uri/envoy.yaml#L26-L56)</span>. In this example we need to be able to support a variety of different types of users. Since we have 2 different user types / token issuers, we create to different JWT Provider configurations (one for each identity provider). Both of them use the `from_headers:` parameter to specify the token source as the `Actor-Token` header. 
+
+Because of this variability we had to change our logic for token validation and enforcement:
+
+The configuration snippet below is how we express this logic:
+* The `match` object specifies that any URI must meet the requirements in the `requires` object
+* The `requires` object specifies that a request must have (<span style="color:red"><u>a Gateway issued system identity token</u></span>) <strong>AND a user with</strong> ( <span style="color:blue"><u>a workforce Identity token</u></span> <strong>OR</strong> <span style="color:blue"><u>a Consumer Identity Token</u></span> ))
+
+<pre><code>
+                      rules:
+                        - match:
+                            prefix: /
+                          requires:
+                            <span style="color:red"><strong>requires_all</strong></span>:
+                              requirements:
+                                - <span style="color:red"><strong>provider_name</strong></span>: gateway_provider
+                                - <span style="color:blue"><strong>requires_any</strong></span>:
+                                    requirements:
+                                      - <span style="color:blue"><strong>provider_name</strong></span>: workforce_provider
+                                      - <span style="color:blue"><strong>provider_name</strong></span>: consumer_provider
+
+</code></pre>
+
+* The `requires_all` object specifies that all of the requirements in the `requirements` array must be true to pass.
+* The `requirements` array contains a `provider_name` and a `requires_any` clause. If there were 3 or 4 elements in the array then all of the requirements would need to be true to pass. In this example we only have 2 requirements and one of those has sub-requirements.
+* The `requires_any` object contains another `requirements` array. If any of the requirements in this array are true then the `requires_any` will also evaluate to true.
+
+
+### Authorization Stage 2 - Open Policy Agent Policies
+
+<pre><code>
+import input.attributes.request.http.headers["actor-token"] as actorToken
+import input.attributes.request.http.headers["app-token"] as appToken
+</code></pre>
 
