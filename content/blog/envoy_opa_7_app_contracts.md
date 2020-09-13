@@ -41,7 +41,6 @@ Here is a list of the Getting Started Guides that are currently available.
 1. <span style="color:blue">[JWS Signature Validation with Envoy]({{< ref "/blog/envoy_opa_6_envoy_jws.md" >}} "Learn how to validate JWS signatures natively with Envoy")</span>
 1. <span style="color:blue">[Putting It All Together with Composite Authorization]({{< ref "/blog/envoy_opa_7_app_contracts.md" >}} "Learn how to Implement Application Specific Authorization Rules")</span>
 
-# Draft Article that is Under construction 
 ## Introduction
 
 In this example we are going to simulate an ecommerce company called `Example.com` that has a published set of APIs and multiple client applications. Each client application has:
@@ -390,6 +389,87 @@ Envoy is looking for results of the `allow` rule. The structure of our response 
 } 
 </code></pre>
 
+With that explanation behind us, you can <span style="color:blue">[read through the entire policy in context on github](https://github.com/helpfulBadger/envoy_getting_started/blob/master/07_opa_validate_method_uri/policy.rego)</span>.
+
+
 ## Running our Example Through Its Paces
 
+We use Postman and Newman to setup the tests for this getting started guide. There are some great tutorials on the Postman site that describe how to write test scripts.
+1. <span style="color:blue">[Writing Pre-request Scripts](https://learning.postman.com/docs/writing-scripts/pre-request-scripts/)</span>
+1. <span style="color:blue">[Writing Test Scripts](https://learning.postman.com/docs/writing-scripts/test-scripts/)</span>
+1. <span style="color:blue">[Test Script Examples](https://learning.postman.com/docs/writing-scripts/script-references/test-examples/)</span>
+1. <span style="color:blue">[Working with Data Files](https://learning.postman.com/docs/running-collections/working-with-data-files/)</span>
+1. <span style="color:blue">[Running test from the command line with Newman](https://learning.postman.com/docs/running-collections/using-newman-cli/command-line-integration-with-newman/)</span>
 
+This example is a lot more powerful than the others we have tackled in this series of getting started guides. As such it requires a lot more tests to see if it is functioning correctly. We have a <span style="color:blue">[postman collection](https://github.com/helpfulBadger/envoy_getting_started/blob/master/07_opa_validate_method_uri/data/Envoy_OPA.postman_collection.json)</span> with 2 types of tests:
+* Statically defined tests in the folder named `Static-Test-Cases`
+* Tests that use iteration data in all of the other folders
+
+### Static Test Cases
+
+This folder contains one templated request definition for every endpoint. That is 56 requests in total. This collection is simply to show how many endpoints even a simple web site requires to operate. 
+We have created folder level scripts to set up data for our templates. 
+
+**Folder level Pre-Request Script**
+
+The pre-request script simply sets the templated values for the request port and JWS tokens for the User and application. These statically defined values use the "super app" that has permission for all endpoints. The postman library provides the `pm.environment.set` command to set values in our template.
+
+<pre><code><span style="color:blue"><strong>pm.environment.set</strong></span>("port", "8080");
+<span style="color:blue"><strong>pm.environment.set</strong></span>("ActorToken", "...")
+<span style="color:blue"><strong>pm.environment.set</strong></span>("AppToken", "...");
+</code></pre>
+
+**Folder level Test Script**
+
+The test script simply checks for a successful response.
+
+<pre><code><span style="color:blue"><strong>pm.test</strong></span>("response should be okay", function () {
+      <span style="color:blue"><strong>pm.response.to.be.success</strong></span>;
+      <span style="color:blue"><strong>pm.response.to.not.be.error</strong></span>;
+});
+</code></pre>
+
+### Iteration Data Based Tests
+
+Postman / Newman loads each record in the array in our test data file into the template variables in our Postman collection. Each record has the following properties:
+* Test case ID
+* The App ID
+* The Actor Token to use
+* The Application token to use
+* The host to send the request to
+* The port on that host to send the request to
+* The method to use in the request
+* The URI to use in the request
+* The pattern that this test exercises
+* The expected result
+
+An example is shown below. 
+
+<pre><code>  {
+    <span style="color:blue"><strong>"id"</strong></span>: "001",
+    <span style="color:blue"><strong>"App"</strong></span>: "app_000123",
+    <span style="color:blue"><strong>"ActorToken"</strong></span>: "...",
+    <span style="color:blue"><strong>"AppToken"</strong></span>: "...",
+    <span style="color:blue"><strong>"host"</strong></span>: "localhost",
+    <span style="color:blue"><strong>"port"</strong></span>: "8080",
+    <span style="color:blue"><strong>"method"</strong></span>: "GET",
+    <span style="color:blue"><strong>"uri"</strong></span>: "/api/customer",
+    <span style="color:blue"><strong>"pattern"</strong></span>: "/api/customer",
+    <span style="color:blue"><strong>"expect"</strong></span>: 200
+  }
+</code></pre>
+
+The post execution test only needs one piece of data from the record for our completion test. That is the `expect` value from the record. We get that using the `pm.iterationData.get` command. 
+
+<pre><code><span style="color:blue"><strong>var</strong></span> expect = <span style="color:blue"><strong>pm.iterationData.get</strong></span>("expect")
+
+<span style="color:blue"><strong>pm.test</strong></span>("GET response have return status: " + expect, function () {
+      <span style="color:blue"><strong>pm.response.to.have.status</strong></span>( <span style="color:blue"><strong>Number</strong></span>( expect) )
+});
+</code></pre>
+
+There are 4 sets of templates and data files. You can run them all to test our permissions with the following command <pre><code>./demonstrate_user_and_api_contracts.sh </code></pre> in the example's based directory `07_opa_validate_method_uri`.
+
+# Congratulations
+ 
+ We have just completed our first semi-realistic example. In future lessons we will layer on more features and refactor this example to show a more realistic deployment.
