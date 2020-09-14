@@ -40,6 +40,7 @@ Here is a list of the Getting Started Guides that are currently available.
 1. <span style="color:blue">[JWS Signature Validation with OPA]({{< ref "/blog/envoy_opa_5_opa_jws.md" >}} "Learn how to validate JWS signatures with Open Policy Agent")</span>
 1. <span style="color:blue">[JWS Signature Validation with Envoy]({{< ref "/blog/envoy_opa_6_envoy_jws.md" >}} "Learn how to validate JWS signatures natively with Envoy")</span>
 1. <span style="color:blue">[Putting It All Together with Composite Authorization]({{< ref "/blog/envoy_opa_7_app_contracts.md" >}} "Learn how to Implement Application Specific Authorization Rules")</span>
+1. <span style="color:blue">[Configuring Envoy Logs Taps and Traces]({{< ref "/blog/envoy_opa_8_logs_taps_and_traces.md" >}} "Learn how to configure Envoy's access logs taps for capturing full requests & responses and traces")</span>
 
 ## Introduction
 
@@ -181,7 +182,8 @@ We can pass the validated JWS token body to Open Policy Agent by adding a couple
 
 To pass this data to Open Policy Agent, in the `envoy.filters.http.ext_authz` section, add the array named `metadata_context_namespaces`. This array specifies the names of the Envoy dynamic metadata namespaces to forward to the OPA Authorization Service. See the configuration change highlighted in blue below.
 
-<pre><code>                  - name: envoy.filters.http.ext_authz
+``` yaml {linenos=inline,hl_lines=[11,12],linenostart=1}
+                  - name: envoy.filters.http.ext_authz
                     typed_config:
                       "@type": type.googleapis.com/envoy.extensions.filters.http.ext_authz.v3.ExtAuthz
                       failure_mode_allow: false
@@ -191,20 +193,22 @@ To pass this data to Open Policy Agent, in the `envoy.filters.http.ext_authz` se
                           stat_prefix: ext_authz
                         timeout: 0.5s
                       include_peer_certificate: true
-                      <span style="color:blue"><strong>metadata_context_namespaces:
-                      - envoy.filters.http.jwt_authn</strong></span>
+>                      metadata_context_namespaces:
+>                      - envoy.filters.http.jwt_authn
                   - name: envoy.filters.http.router
                     typed_config: {}
-</code></pre>
+```
 
 These changes add some data to the `metadata_context`. For each dynamic metadata namespace added, it will add it's data under a key that matches the namespace name in the `filter_metadata` object. For this example it adds each token's payload in the `envoy.filters.http.jwt_authn` object underneath the `fields` object. As you can see from the example below, it adds a lot of extra hierarchy via nested objects that express data types to the original object. So, it may not be worth it to have Envoy forward the validated payload. For us configuring Envoy to forward the token and simply reading the token payload directly is less complicated. 
 
 See the resultant `metadata_context` below for an example.
-<pre><code>  "input": {
+
+``` yaml {linenos=inline,hl_lines=["5-28"],linenostart=1}
+  "input": {
     "attributes": {
       "destination": { "...":"..." },
       "metadata_context": {
-        <span style="color:blue"><strong>"filter_metadata": {
+>        "filter_metadata": {
           "envoy.filters.http.jwt_authn": {
             "fields": {
               "workforce_provider": {
@@ -234,7 +238,7 @@ See the resultant `metadata_context` below for an example.
               }
             }
           }
-        }</strong></span>
+        }
       },
       "request": {"...": "..."},
       "source":  {"...": "..."}
@@ -244,7 +248,7 @@ See the resultant `metadata_context` below for an example.
     "parsed_query": {},
     "truncated_body": false
   }
-</code></pre>
+```
 
 ### Authorization Stage 2 - Open Policy Agent Policies
 
@@ -340,8 +344,9 @@ Whether rejection reasons are returned to the user or not depends on the circums
 * The same is true for the second messages rule block. 
 * This section will result in a messages array that has either 0, 1 or 2 elements. 
 
-<pre><code>messages[ msg ]{
-  <span style="color:blue"><strong>not apiPermittedForClient</strong></span>
+``` yaml {linenos=inline,hl_lines=[2,11],linenostart=1}
+messages[ msg ]{
+  not apiPermittedForClient
   msg := {
     "id"  : "1",
     "priority"  : "5",
@@ -350,14 +355,14 @@ Whether rejection reasons are returned to the user or not depends on the circums
 }
 
 messages[ msg ]{
-  <span style="color:red"><strong>not userTypeAppropriateForClient</strong></span>
+  not userTypeAppropriateForClient
   msg := {
     "id"  : "2",
     "priority"  : "5",
     "message" : "The authenticated user type is not allowed for the client application"
   }
 }
-</code></pre>
+```
 
 #### Now let's return the results to Envoy
 
@@ -368,16 +373,17 @@ Envoy is looking for results of the `allow` rule. The structure of our response 
 * The body value must also be a string. So, we can't return any of the other mock data that we have here as an object. So first we declare it as an anonymous object then immediately pass it to the json marshaller. This will return a string. The json marshaller should be able to handle any numeric, null or undefined values for us and always return a string. 
 * With these guarantees, we can be confident that this block will always return a defined result to Envoy
 
-<pre><code>allow = response {
+``` go {linenos=inline,hl_lines=[3,10],linenostart=1}
+allow = response {
   response := {
-    "allowed": <span style="color:blue"><strong>decision</strong></span>,
+    "allowed": decision,
     "headers": {
       "X-Authenticated-User": "true", 
       "X-Authenticated-App": "true",
       "Endpoint-ID": endpointID,
       "Content-Type": "application/json"
     },
-    "body" : <span style="color:blue"><strong>json.marshal</strong></span>(
+    "body" : json.marshal(
                       {
                         "Authorized-User-Type": userTypeAppropriateForClient,
                         "Authorized-Endpoint": apiPermittedForClient,
@@ -387,7 +393,7 @@ Envoy is looking for results of the `allow` rule. The structure of our response 
                       })
   }
 } 
-</code></pre>
+```
 
 With that explanation behind us, you can <span style="color:blue">[read through the entire policy in context on github](https://github.com/helpfulBadger/envoy_getting_started/blob/master/07_opa_validate_method_uri/policy.rego)</span>.
 
@@ -414,20 +420,22 @@ We have created folder level scripts to set up data for our templates.
 
 The pre-request script simply sets the templated values for the request port and JWS tokens for the User and application. These statically defined values use the "super app" that has permission for all endpoints. The postman library provides the `pm.environment.set` command to set values in our template.
 
-<pre><code><span style="color:blue"><strong>pm.environment.set</strong></span>("port", "8080");
-<span style="color:blue"><strong>pm.environment.set</strong></span>("ActorToken", "...")
-<span style="color:blue"><strong>pm.environment.set</strong></span>("AppToken", "...");
-</code></pre>
+``` javascript {linenos=inline,linenostart=1}
+pm.environment.set("port", "8080");
+pm.environment.set("ActorToken", "...")
+pm.environment.set("AppToken", "...");
+```
 
 **Folder level Test Script**
 
 The test script simply checks for a successful response.
 
-<pre><code><span style="color:blue"><strong>pm.test</strong></span>("response should be okay", function () {
-      <span style="color:blue"><strong>pm.response.to.be.success</strong></span>;
-      <span style="color:blue"><strong>pm.response.to.not.be.error</strong></span>;
+``` javascript {linenos=inline,linenostart=1}
+pm.test("response should be okay", function () {
+      pm.response.to.be.success;
+      pm.response.to.not.be.error;
 });
-</code></pre>
+```
 
 ### Iteration Data Based Tests
 
@@ -445,30 +453,36 @@ Postman / Newman loads each record in the array in our test data file into the t
 
 An example is shown below. 
 
-<pre><code>  {
-    <span style="color:blue"><strong>"id"</strong></span>: "001",
-    <span style="color:blue"><strong>"App"</strong></span>: "app_000123",
-    <span style="color:blue"><strong>"ActorToken"</strong></span>: "...",
-    <span style="color:blue"><strong>"AppToken"</strong></span>: "...",
-    <span style="color:blue"><strong>"host"</strong></span>: "localhost",
-    <span style="color:blue"><strong>"port"</strong></span>: "8080",
-    <span style="color:blue"><strong>"method"</strong></span>: "GET",
-    <span style="color:blue"><strong>"uri"</strong></span>: "/api/customer",
-    <span style="color:blue"><strong>"pattern"</strong></span>: "/api/customer",
-    <span style="color:blue"><strong>"expect"</strong></span>: 200
-  }
-</code></pre>
+``` json {linenos=inline,linenostart=1}
+{
+  "id": "001",
+  "App": "app_000123",
+  "ActorToken": "...",
+  "AppToken": "...",
+  "host": "localhost",
+  "port": "8080",
+  "method": "GET",
+  "uri": "/api/customer",
+  "pattern": "/api/customer",
+  "expect": 200
+}
+```
 
 The post execution test only needs one piece of data from the record for our completion test. That is the `expect` value from the record. We get that using the `pm.iterationData.get` command. 
 
-<pre><code><span style="color:blue"><strong>var</strong></span> expect = <span style="color:blue"><strong>pm.iterationData.get</strong></span>("expect")
+``` javascript {linenos=inline,linenostart=1}
+var expect = pm.iterationData.get("expect")
 
-<span style="color:blue"><strong>pm.test</strong></span>("GET response have return status: " + expect, function () {
-      <span style="color:blue"><strong>pm.response.to.have.status</strong></span>( <span style="color:blue"><strong>Number</strong></span>( expect) )
+pm.test("GET response have return status: " + expect, function () {
+      pm.response.to.have.status( Number( expect) )
 });
-</code></pre>
+```
 
-There are 4 sets of templates and data files. You can run them all to test our permissions with the following command <pre><code>./demonstrate_user_and_api_contracts.sh </code></pre> in the example's based directory `07_opa_validate_method_uri`.
+There are 4 sets of templates and data files. You can run them all to test our permissions with the following command ...
+``` bash
+./demonstrate_user_and_api_contracts.sh
+```
+...in the example's based directory `07_opa_validate_method_uri`.
 
 # Congratulations
  

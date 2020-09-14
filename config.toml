@@ -126,33 +126,10 @@ disableLanguages = [""]
 [markup]
   defaultMarkdownHandler = "goldmark"
   [markup.goldmark]
-    [markup.goldmark.extensions]
-      definitionList = true
-      footnote = true
-      linkify = true
-      strikethrough = true
-      table = true
-      taskList = true
-      typographer = true
-    [markup.goldmark.parser]
-      attribute = true
-      autoHeadingID = true
-      autoHeadingIDType = "github"
     [markup.goldmark.renderer]
       unsafe = true
-      hardWraps = false
-      xhtml = false  
+      xhtml = false
   [markup.highlight]
     codeFences = true
-    guessSyntax = true
-    hl_Lines = ""
-    lineNoStart = 1
-    lineNos = true
-    lineNumbersInTable = true
-    noClasses = false
-    style = "dracula"
+    style = "igor"
     tabWidth = 2
-  [markup.tableOfContents]
-    endLevel = 3
-    ordered = false
-    startLevel = 1

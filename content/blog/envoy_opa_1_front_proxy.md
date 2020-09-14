@@ -35,6 +35,7 @@ Here is a list of the Getting Started Guides that are currently available.
 1. <span style="color:blue">[JWS Signature Validation with OPA]({{< ref "/blog/envoy_opa_5_opa_jws.md" >}} "Learn how to validate JWS signatures with Open Policy Agent")</span>
 1. <span style="color:blue">[JWS Signature Validation with Envoy]({{< ref "/blog/envoy_opa_6_envoy_jws.md" >}} "Learn how to validate JWS signatures natively with Envoy")</span>
 1. <span style="color:blue">[Putting It All Together with Composite Authorization]({{< ref "/blog/envoy_opa_7_app_contracts.md" >}} "Learn how to Implement Application Specific Authorization Rules")</span>
+1. <span style="color:blue">[Configuring Envoy Logs Taps and Traces]({{< ref "/blog/envoy_opa_8_logs_taps_and_traces.md" >}} "Learn how to configure Envoy's access logs taps for capturing full requests & responses and traces")</span>
 
 ## Overview
 
@@ -120,4 +121,4 @@ You should see something like this if you successfully called HTTPBin through En
 
 # Congratulations
 
-Congratulations, you have successully stood up your first Envoy instance and configured it to forward traffic! This is the simplest possible Envoy configuration :)  We don't have any security yet or any other features that Envoy is famous for. We will get to that in future articles. Feel free to use <span style="color:blue">[postman](https://www.postman.com/)</span> to explore other requests that you can send. Additionally, don't forget to explore Envoy's admin console by pointing your web browser to <span style="color:blue">[http://localhost:8001](http://localhost:8001)</span>
+Congratulations, you have successfully stood up your first Envoy instance and configured it to forward traffic! This is the simplest possible Envoy configuration :)  We don't have any security yet or any other features that Envoy is famous for. We will get to that in future articles. Feel free to use <span style="color:blue">[postman](https://www.postman.com/)</span> to explore other requests that you can send. Additionally, don't forget to explore Envoy's admin console by pointing your web browser to <span style="color:blue">[http://localhost:8001](http://localhost:8001)</span>
