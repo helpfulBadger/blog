@@ -133,3 +133,7 @@ disableLanguages = [""]
     codeFences = true
     style = "igor"
     tabWidth = 2
+    anchorLineNos = true
+    lineNumbersInTable = false
+    noClasses = true
+    lineAnchors = "kkkk"
