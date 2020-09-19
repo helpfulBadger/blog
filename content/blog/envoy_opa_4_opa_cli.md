@@ -126,17 +126,23 @@ As you can see we simply drop in Envoy's JSON input that we are testing and the 
 OPA policy agent also supports running as a service and accessing it via REST APIs. <span style="color:blue">[Detailed API information](https://www.openpolicyagent.org/docs/latest/rest-api/)</span> can be found on the Open Policy Agent web site. Here is a summary of the APIs. 
 
 **Policy API for Creating, Updating or Deleting Policies**
-* <pre><code>GET    /v1/policies      #--- List Policies </code></pre> 
-* <pre><code>GET    /v1/policies/&ltid&gt #--- Get a specific Policy </code></pre> 
-* <pre><code>PUT    /v1/policies/&ltid&gt #--- Create or Update a Policy </code></pre> 
-* <pre><code>DELETE /v1/policies/&ltid&gt #--- Delete a policy </code></pre> 
+
+``` markdown
+* GET    /v1/policies      #--- List Policies  
+* GET    /v1/policies/&ltid&gt #--- Get a specific Policy  
+* PUT    /v1/policies/&ltid&gt #--- Create or Update a Policy  
+* DELETE /v1/policies/&ltid&gt #--- Delete a policy  
+```
 
 **Data API for Creating, Updating or Deleting Data and Getting Decisions**
-* <pre><code>GET    /v1/data/{path:.+} #---  Get a Document </code></pre> 
-* <pre><code>POST   /v1/data/{path:.+} #---  Get a Document (with Input e.g. get a decision). The input document `{ "input": ... }` is passed in the request body</code></pre> 
-* <pre><code>PUT    /v1/data/{path:.+} #---  Create or Overwrite a Document </code></pre> 
-* <pre><code>PATCH  /v1/data/{path:.+} #---  Patch a Document </code></pre> 
-* <pre><code>DELETE /v1/data/{path:.+} #---  Delete a Document </code></pre> 
+
+``` markdown
+* GET    /v1/data/{path:.+} #---  Get a Document  
+* POST   /v1/data/{path:.+} #---  Get a Document (with Input e.g. get a decision). The input document `{ "input": ... }` is passed in the request body 
+* PUT    /v1/data/{path:.+} #---  Create or Overwrite a Document  
+* PATCH  /v1/data/{path:.+} #---  Patch a Document  
+* DELETE /v1/data/{path:.+} #---  Delete a Document  
+```
 
 **Tips when using the API**
 * It is important to understand how the OPA document model works. The <span style="color:blue">[document model](https://www.openpolicyagent.org/docs/latest/philosophy/#how-does-opa-work)</span> is described on the Open Policy Agent web site. 
