@@ -457,6 +457,13 @@ The other statements should be familiar from our previous discussion of Envoy's 
 
 The <span style="color:blue">[signature verification policy tests](https://github.com/helpfulBadger/envoy_getting_started/blob/master/09_sign_validate_request/verify/policy_test.rego)</span> are more complicated than the tests for the signing process due to increased complexity of the policy. 
 
+# Running the Example
+
+Simply run the `./demonstrate_sign_verify.sh` script to see request signing and verification in action. The example scripts leverage the same logs, taps and traces configuration as Getting started guide # 8. 
+
+Link to script to run <span style="color:blue">[the request signing & verification example](https://github.com/helpfulBadger/envoy_getting_started/blob/master/09_sign_validate_request/demonstrate_sign_verify.sh)</span>
+
+
 # Congratulations
 
 We have completed our example to demonstrate how to sign and validate HTTP requests. This capability is very powerful and effective and protecting the integrity of transactions. The best part about this approach is that this powerful capability can be added to any application in your portfolio without requiring code changes to every system. 
