@@ -5,14 +5,16 @@ draft = false
 date  = 2020-10-07T09:30:44-04:00
 description = "Learn how to use Envoy & OPA to sign and validate HTTP Requests"
 tags = [
-    "logs",
-    "taps",
-    "traces",
+    "OPA",
+    "Open Policy Agent",
+    "JWS",
+    "Signatures"
     "envoy"
 ]
 categories = [
     "cloud",
     "observability",
+    "security",
     "service mesh"
 ]
 images  = ["img/2020/10/lock-key-hRXIKdxoaPo-unsplash.jpg"]
