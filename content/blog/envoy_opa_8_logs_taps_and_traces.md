@@ -38,10 +38,11 @@ Here is a list of the Getting Started Guides that are currently available.
 1. <span style="color:blue">[Adding Observability Tools]({{< ref "/blog/envoy_opa_2_adding_observability.md" >}} "Learn how to add ElasticSearch and Kibana to your Envoy front proxy environment")</span>
 1. <span style="color:blue">[Plugging Open Policy Agent into Envoy]({{< ref "/blog/envoy_opa_3_adding_open_policy_agent.md" >}} "Learn how to use Open Policy Agent with Envoy for more powerful authorization rules")</span>
 1. <span style="color:blue">[Using the Open Policy Agent CLI]({{< ref "/blog/envoy_opa_4_opa_cli.md" >}} "Learn how to use Open Policy Agent Command Line Interface")</span>
-1. <span style="color:blue">[JWS Signature Validation with OPA]({{< ref "/blog/envoy_opa_5_opa_jws.md" >}} "Learn how to validate JWS signatures with Open Policy Agent")</span>
-1. <span style="color:blue">[JWS Signature Validation with Envoy]({{< ref "/blog/envoy_opa_6_envoy_jws.md" >}} "Learn how to validate JWS signatures natively with Envoy")</span>
+1. <span style="color:blue">[JWS Token Validation with OPA]({{< ref "/blog/envoy_opa_5_opa_jws.md" >}} "Learn how to validate JWS tokens with Open Policy Agent")</span>
+1. <span style="color:blue">[JWS Token Validation with Envoy]({{< ref "/blog/envoy_opa_6_envoy_jws.md" >}} "Learn how to validate JWS tokens natively with Envoy")</span>
 1. <span style="color:blue">[Putting It All Together with Composite Authorization]({{< ref "/blog/envoy_opa_7_app_contracts.md" >}} "Learn how to Implement Application Specific Authorization Rules")</span>
 1. <span style="color:blue">[Configuring Envoy Logs Taps and Traces]({{< ref "/blog/envoy_opa_8_logs_taps_and_traces.md" >}} "Learn how to configure Envoy's access logs, taps for capturing full requests & responses and traces")</span>
+1. <span style="color:blue">[Sign / Verify HTTP Requests]({{< ref "/blog/envoy_opa_9_sign_verify.md" >}} "Learn how to use Envoy & OPA to sign and validate HTTP Requests")</span>
 
 ## Introduction
 
@@ -73,6 +74,8 @@ Read through this snippet of envoy configuration. The full configuration files f
 Elastic common schema was introduced to make it easier to analyze logs across applications. <span style="color:blue">[This article on the elastic.co web site](https://www.elastic.co/blog/introducing-the-elastic-common-schema)</span> is a good read and explains it in more detail. The <span style="color:blue">[reference for elastic common schema](https://www.elastic.co/guide/en/ecs/current/index.html)</span> provides names for many typical deployment environments, and cloud environments etc. 
 
 Below is the abbreviation envoy.yaml configuration that shows how to specify our logging configuration. The explanation of the configuration follows. 
+
+<strong>
 
 ``` yaml {linenos=inline,hl_lines=[15,18,19,20,22,24,31,40],linenostart=1}
 static_resources:
@@ -121,6 +124,8 @@ static_resources:
 admin:
 ```
 
+</strong>
+
 The `access_log` configuration section is part of the HTTP Connection Manager Configuration and at the same nesting level as the `route_config` and `http_filters` sections. 
 * We use a typed config `type.googleapis.com/envoy.extensions.access_loggers.file.v3.FileAccessLog` in version 3 of the configuration API
 * The file path is set to standard out to so that log aggregation can be managed by docker. 
@@ -139,6 +144,8 @@ Taps let us capture full requests and responses. More details are for <span styl
 Below is abbreviated structure of our Envoy.yaml config file. The highlighted section is the tap configuration. Taps are simply another available HTTP filter. 
 * We have match configuration that allows us to selectively target what we tap and what we don't. 
 * The output configuration section is where we specify where the taps should be sent. For the `file_per_tap` sink, remember to add the trailing slash to the path otherwise no files will be written. Additionally, the file path can't be set to standard out due to the expectation that new files will be opened under the subdirectory that is specified. 
+
+<strong>
 
 ``` yaml {linenos=inline,hl_lines=["12-22"],linenostart=1}
 static_resources:
@@ -173,6 +180,8 @@ admin:
 ...
 ```
 
+</strong>
+
 > NOTE: The tap filter is experimental and is currently under active development. There is currently a very limited set of match conditions, output configuration, output sinks, etc. Capabilities will be expanded over time and the configuration structures are likely to change.
 
 ## Enabling Traces
@@ -192,6 +201,7 @@ In lines 11 -19 below, the tracing configuration is standard part of the version
 * We have set up zipkin as the output format with jaegar as the configured destination. HTTP and gRPC are both supported. The example uses HTTP protocol for transmitting the traces. 
 * Our trace configuration refers to a cluster that we have named jaeger. So, we need to add a cluster configuration for it in the clusters section of the configuration file. Lines 28 through 40 points Envoy to our all-in-one jaeger container and port 9411 on that container. 
 
+<strong>
 
 ``` yaml {linenos=inline,hl_lines=["11-19","28-40"],linenostart=1}
 static_resources:
@@ -237,6 +247,8 @@ static_resources:
 admin:
   ...
 ```
+
+</strong>
 
 # Running the Solution
 
