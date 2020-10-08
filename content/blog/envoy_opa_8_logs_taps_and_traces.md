@@ -292,5 +292,3 @@ The Jaeger trace details page shows all of the tags that were captured at each l
 # Congratulations
 
 We have completed a tour of another Envoy feature. These observability features will come in handy as our system becomes more complex. Additionally, Envoy is a very powerful tool for intercepting our traffic in a legacy environment. This can give all of our legacy applications consistently formatted data across our entire environment. This super-power can be incredibly critical in an environment with a lot of older applications that don't have active development, limited engineering knowledge and obsolete technology stacks. 
-
-

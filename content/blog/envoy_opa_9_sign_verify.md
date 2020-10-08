@@ -292,3 +292,171 @@ test_fully_populated_req_allowed {
 </strong><br>
 
 ## Validating the signature upon Receipt 
+
+Link to <span style="color:blue">[signature verification policy](https://github.com/helpfulBadger/envoy_getting_started/blob/master/09_sign_validate_request/verify/policy.rego)</span>
+
+
+### Extracting the signature from the request
+
+The first part of the policy:
+* Extracts the digest from the incoming request header
+* Validates the JWS Digest token
+* Places the contents of the validated token in a variable for other rules
+
+<strong>
+
+``` javascript {linenos=inline,hl_lines=[1,3,5,7,9,11,13,15,17],linenostart=1}
+package envoy.authz
+
+import input.attributes.request.http as http_request
+import input.attributes.request.http.headers["digest"] as digest
+
+jwks = `{...}`
+
+verified_digest = v {
+  [isValid, _, payload ] := io.jwt.decode_verify( digest, 
+  { 
+      "cert": jwks,
+      "aud": "apigateway.example.com"  // <-- Required since the token contains an `aud` claim in the payload
+  })
+  v := {
+    "isValid": isValid,
+    "payload": payload
+  }
+}
+```
+
+</strong>
+
+* Line 4: Extracts the request's signature token from the Digest header
+* Line 8: If validated, sets a variable to hold the decoded token payload
+* Line 9: Decodes and validates the token using the `io.jwt.decode_verify()` built-in function
+* Line 11: Provides the decode function the public keys it needs to validate the signature
+* Line 12: We must provide an expected audience claim when the token contains an audience claim.  The audience claim is an array. If any member of that array matches the supplied audience then that validation rule will pass. 
+* Line 14: Assigns the decoded token to named properties in an object that in turn is assigned to the `verified_digest`
+
+<br>
+
+### Comparing the request to the validated token
+
+Now we can do the important part and compare the values in the request with what was preserved in the JWS token. 
+
+<strong>
+
+``` javascript {linenos=inline,hl_lines=[1,3,5,7,9,11,13,15,17,19],linenostart=19}
+headersMatch {
+  headerHash == verified_digest.payload.headerDigest
+}
+bodiesMatch {
+  bodyHash == verified_digest.payload.bodyDigest
+}
+hostsMatch {
+  http_request.host == verified_digest.payload.host
+}
+methodsMatch {
+  http_request.method == verified_digest.payload.method
+}
+pathsMatch {
+  http_request.path == verified_digest.payload.path
+}
+```
+
+</strong>
+
+* Line 20: The list of critical headers from the JWS token is used to filter the request's headers and calculate a hash using the same statements that were used in the signing process (not shown). If they match then `headersMatch` is set to true.
+* Line 23: The request's body is extracted and used to calculate a hash using the same statements that were used in the signing process (not shown).  If they match then `bodiesMatch` is set to true.
+* Lines 26, 29 & 32: Since these values are captured directly in the token, no special processing is required. They are simply compared to see if they have been altered.
+
+<br>
+
+### Checking Request Recency
+
+We don't want to leave an unbounded amount of time for a request to be processed. The next section of the policy checks to see if the request was initiated recently enough.
+
+<strong>
+
+``` javascript {linenos=inline,hl_lines=[1,3,5],linenostart=34}
+requestDuration = time.now_ns() - verified_digest.payload.created
+
+withinRecencyWindow {
+  requestDuration < 34159642955430000
+}
+```
+
+</strong>
+
+* Line 34: uses the built-in function `time.now_ns()` to calculate the time passed since the request was initiated.
+* Line 37: Uses the calculated request duration and compares it to our business rule
+
+<br>
+
+### Generating Rule Failure Messages
+
+An this side of the connection our messages need 2 conditions to properly know which rules failed. 
+
+<strong>
+
+``` javascript {linenos=inline,hl_lines=[1,3,5,7,9],linenostart=39}
+messages[ msg ]{
+  verified_digest.isValid
+	not headersMatch
+  msg := {
+    "id"  : "7",
+    "priority"  : "5",
+    "message" : "Critical request headers do not match signature"
+  }
+}
+```
+
+</strong>
+
+* Line 40: If the digest token is simply missing or corrupt, we don't want to return messages for every single rule that failed. If the signature token is missing entirely, the issue isn't really that the headers don't match. The real issue is that the signature token is missing. So, this guard rule makes sure that we at least had a valid signature token before we check to see if the headers didn't match. 
+* Line 41: If the headers don't match then we return message indicating that. 
+* Numerous other similar rules are in the full policy file (not shown here) testing for similar conditions.
+
+<br>
+
+### Calculating the final decision on the validity of the request
+
+Lines 49 through 55 below calculate the final decision on the validity of the request. When we name our rules intuitively, the decision logic is pretty intuitive as well. In this case the methods, paths, hosts, headers and bodies must all 
+
+<strong>
+
+``` javascript {linenos=inline,hl_lines=[1,3,5,7,9,11,13,15,17,19,21,23],linenostart=48}
+default decision = false
+decision {
+  methodsMatch
+  pathsMatch
+  hostsMatch
+  headersMatch
+  bodiesMatch
+  withinRecencyWindow
+}
+
+default headerValue = "false"
+headerValue = h {
+  decision
+  h := "true"
+}
+
+allow = {
+  "allowed": decision,
+  "headers": {
+    "Valid-Request": headerValue
+  },
+  "body" : json.marshal({ "Authorization-Failures": messages })
+}
+```
+
+</strong>
+
+Line 69: OPA's built-in function `json.marshal()` converts all of the rule failures into a string for sending back to the caller.
+The other statements should be familiar from our previous discussion of Envoy's external authorization contract. So, we won't break that down again.
+
+<br>
+
+The <span style="color:blue">[signature verification policy tests](https://github.com/helpfulBadger/envoy_getting_started/blob/master/09_sign_validate_request/verify/policy_test.rego)</span> are more complicated than the tests for the signing process due to increased complexity of the policy. 
+
+# Congratulations
+
+We have completed our example to demonstrate how to sign and validate HTTP requests. This capability is very powerful and effective and protecting the integrity of transactions. The best part about this approach is that this powerful capability can be added to any application in your portfolio without requiring code changes to every system. 
