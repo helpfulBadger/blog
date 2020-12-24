@@ -8,7 +8,7 @@ tags = [
     "OPA",
     "Open Policy Agent",
     "JWS",
-    "Signatures"
+    "Signatures",
     "envoy"
 ]
 categories = [
